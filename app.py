@@ -51,7 +51,7 @@ def get_city_from_coordinates(latitude, longitude):
 
 
 def get_weather_data(city):
-    api_key = '7e6d29e7cec01c14ae4af476c7b254f8'
+    api_key = 'Api key'
     base_url = 'https://api.openweathermap.org/data/2.5/weather'
     params = {'q': city, 'appid': api_key, 'units': 'metric'}
 
@@ -109,8 +109,8 @@ def air_quality(city):
 
 
 def get_air_quality_data(city):
-    api_key = '6a68a802-e6b9-4597-ba44-6991e15c7787'
-    base_url = 'https://api.airvisual.com/v2/nearest_city?key=6a68a802-e6b9-4597-ba44-6991e15c7787'
+    api_key = 'Api key'
+    base_url = 'https://api.airvisual.com/v2/nearest_city?key=Api key'
     params = {'city': city, 'key': api_key}
 
     response = requests.get(base_url, params=params)
