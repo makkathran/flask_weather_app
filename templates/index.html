@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="content">
+        <h1>Welcome to the Weather App!</h1>
+        {% if current_user.is_authenticated %}
+            <p>Hello, {{ current_user.username }}!</p>
+        {% endif %}
+        <div id="weather-info">
+            {% if weather_data %}
+                <h2>Weather in {{ weather_data.city }}</h2>
+                <p>Temperature: {{ weather_data.temperature }}°C</p>
+                <p>Description: {{ weather_data.description }}</p>
+                <img src="http://openweathermap.org/img/w/{{ weather_data.icon }}.png" alt="Weather icon">
+            {% else %}
+                <p>Please log in to access the app.</p>
+            {% endif %}
+        </div>
+    <div id="air-quality-info">
+        {% if air_quality_data %}
+            <h2>Air Quality in {{ air_quality_data.city }}</h2>
+            <p>Air Quality Index (AQI): {{ air_quality_data.aqi }}</p>
+            <p>Main Pollutant: {{ air_quality_data.main_pollutant }}</p>
+        {% endif %}
+    </div>
+
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendPosition);
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function sendPosition(position) {
+            fetch("/set_location", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "latitude": position.coords.latitude,
+                    "longitude": position.coords.longitude
+                })
+            }).then(response => response.json()).then(data => {
+                if (data.weather_data) {
+                    const city = data.city;
+                    const weather_data = data.weather_data;
+                    document.getElementById("weather-info").innerHTML = `
+                        <h2>Weather in ${city}</h2>
+                        <p>Temperature: ${weather_data.temperature}°C</p>
+                        <p>Description: ${weather_data.description}</p>
+                        <img src="http://openweathermap.org/img/w/${weather_data.icon}.png" alt="Weather icon">
+                    `;
+                    if (data.air_quality_data) {
+                        const air_quality_data = data.air_quality_data;
+                        document.getElementById("air-quality-info").innerHTML = `
+                            <h2>Air Quality in ${city}</h2>
+                            <p>Air Quality Index (AQI): ${air_quality_data.aqi}</p>
+                            <p>Main Pollutant: ${air_quality_data.main_pollutant}</p>
+                        `;
+                    }
+                }
+            });
+        }
+
+        window.onload = getLocation;
+    </script>
+</body>
+</html>
