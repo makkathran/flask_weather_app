@@ -9,25 +9,20 @@ app.secret_key = 'your_secret_key_here'
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///weather.db'
 
-# Database initialization
 db.init_app(app)
 
-# Flask-Login setup
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
-
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
 @app.route('/')
 @login_required
 def index():
     return render_template('index.html')
-
 
 @app.route("/set_location", methods=['POST'])
 def set_location():
@@ -41,14 +36,12 @@ def set_location():
 
     return jsonify({"weather_data": weather_data, "air_quality_data": air_quality_data, "city": city})
 
-
 def get_city_from_coordinates(latitude, longitude):
     nominatim_url = f"https://nominatim.openstreetmap.org/reverse?lat={latitude}&lon={longitude}&format=json"
     response = requests.get(nominatim_url)
     data = response.json()
     city = data.get("address", {}).get("city", "")
     return city
-
 
 def get_weather_data(city):
     api_key = 'Api key'
@@ -68,7 +61,6 @@ def get_weather_data(city):
         return weather_data
 
     return None
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -93,20 +85,17 @@ def login():
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', form=form)
 
-
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
-
 @app.route('/air_quality/<city>')
 @login_required
 def air_quality(city):
     air_quality_data = get_air_quality_data(city)
     return render_template('air_quality.html', air_quality_data=air_quality_data, city=city)
-
 
 def get_air_quality_data(city):
     api_key = 'Api key'
@@ -124,9 +113,6 @@ def get_air_quality_data(city):
         return air_quality_data
 
     return None
-
-
-
 
 if __name__ == "__main__":
     with app.app_context():
